@@ -1,44 +1,17 @@
 package main
 
 import (
-	"errors"
+	"example.com/bank/fileops"
 	"fmt"
-	"os"
-	"strconv"
 )
 
 //var balance float64 = 2000
 
+var accountBalanceFile = "balance.txt"
+
 func main() {
 	fmt.Println("Welcome to Go Bank!")
 	starter()
-}
-
-func writeBalanceToFiles(balance float64) {
-	balanceText := fmt.Sprint(balance)
-	os.WriteFile("balance.txt", []byte(balanceText), 0644)
-}
-
-func getBalanceFormFile() (float64, error) {
-	data, err := os.ReadFile("balance.txt")
-	if err != nil {
-		return 1000, errors.New("failed to read Balance file")
-	}
-	balanceText := string(data)
-	balance, err := strconv.ParseFloat(balanceText, 64)
-	if err != nil {
-		return 1000, errors.New("failed to parse stored balance value")
-	}
-	return balance, nil
-}
-
-func starter() {
-	fmt.Println("what do you want to do?")
-	fmt.Println("1. Check Balance")
-	fmt.Println("2. Deposit money")
-	fmt.Println("3. Withdraw money")
-	fmt.Println("4. Exit")
-	getUserInput()
 }
 
 func getUserInput() {
@@ -62,7 +35,7 @@ func getUserInput() {
 }
 
 func checkBalance() {
-	balance, err := getBalanceFormFile()
+	balance, err := fileops.GetFloatFormFile(accountBalanceFile)
 	if err != nil {
 		fmt.Println("Error")
 		fmt.Println(err)
@@ -75,7 +48,7 @@ func checkBalance() {
 
 func deposit() {
 	var depositAmount float64
-	balance, err := getBalanceFormFile()
+	balance, err := fileops.GetFloatFormFile(accountBalanceFile)
 	if err != nil {
 		fmt.Println("Error")
 		fmt.Println(err)
@@ -87,13 +60,13 @@ func deposit() {
 	fmt.Println("Deposit Success!")
 	balance += depositAmount
 	fmt.Println("Your new balance is : ", balance)
-	writeBalanceToFiles(balance)
+	fileops.WriteFloatToFiles(balance, accountBalanceFile)
 	starter()
 }
 
 func withdraw() {
 	var withdrawAmount float64
-	balance, err := getBalanceFormFile()
+	balance, err := fileops.GetFloatFormFile(accountBalanceFile)
 	if err != nil {
 		fmt.Println("Error")
 		fmt.Println(err)
@@ -105,7 +78,7 @@ func withdraw() {
 	if balance >= withdrawAmount { // Updated to >= to include exact balance
 		fmt.Println("Withdraw Success!")
 		balance -= withdrawAmount // Directly subtract from balance
-		writeBalanceToFiles(balance)
+		fileops.WriteFloatToFiles(balance, accountBalanceFile)
 		fmt.Println("Your new balance is : ", balance)
 	} else {
 		fmt.Println("You don't have sufficient balance")
